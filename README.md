@@ -31,7 +31,7 @@ The properties are documented inside the configuration file. All values can be o
 
 The tool can be started using
 
-`java -jar perform-nv-cli.jar api.token=******** api.secret=********`
+`java -jar clinv.jar api.token=******** api.secret=********`
 
 The `api.token` and `api.secret` parameters are the only two that have to be specified on the command line. They can be
 persisted in the `config.properties`, but such a use case is discouraged due to security reasons.
