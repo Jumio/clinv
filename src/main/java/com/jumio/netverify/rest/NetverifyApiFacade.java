@@ -1,7 +1,7 @@
 /*
  * Jumio Inc.
  *
- * Copyright (C) 2017
+ * Copyright (C) 2017 - 2018
  * All rights reserved.
  */
 package com.jumio.netverify.rest;
@@ -19,6 +19,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.util.Assert;
 import org.springframework.util.MimeTypeUtils;
 import org.springframework.web.client.RestClientException;
@@ -135,10 +137,18 @@ public final class NetverifyApiFacade {
     private void makeApiCall(HttpHeaders httpHeaders, RestTemplate restTemplate, String serverUrl,
             PerformNetverifyRequest performNetverifyRequest) {
         HttpEntity<PerformNetverifyRequest> httpRequest = new HttpEntity<>(performNetverifyRequest, httpHeaders);
-        PerformNetverifyResponse response = restTemplate.postForEntity(serverUrl, httpRequest,
-                PerformNetverifyResponse.class).getBody();
-        logger.info("Submitted: {}. Jumio scan reference: {}", performNetverifyRequest.getMerchantIdScanReference(),
-                response.getJumioIdScanReference());
+        ResponseEntity<PerformNetverifyResponse> response = restTemplate.postForEntity(serverUrl, httpRequest,
+                PerformNetverifyResponse.class);
+        logResponse(performNetverifyRequest.getMerchantIdScanReference(), response);
+    }
+
+    private void logResponse(String merchantScanRef, ResponseEntity<PerformNetverifyResponse> response) {
+        if (HttpStatus.OK.equals(response.getStatusCode()) && response.getBody() != null) {
+            logger.info("Submitted: {}. Jumio scan reference: {}", merchantScanRef,
+                    response.getBody().getJumioIdScanReference());
+        } else {
+            logger.error("HTTP {}: {}", response.getStatusCodeValue(), response.getBody());
+        }
     }
 
     /**
